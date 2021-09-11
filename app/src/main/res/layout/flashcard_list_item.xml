@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#E8E8E8"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <androidx.cardview.widget.CardView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="0dp"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white">
+
+            <TextView
+                android:id="@+id/flashcard_listitem_term"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_light"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#212121"
+                android:paddingTop="16dp"
+                android:paddingLeft="16dp"
+                android:text="õun"
+                />
+
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_baseline_volume_up_24"
+                android:background="@color/white"
+                android:layout_toLeftOf="@id/flashcard_menu"
+                android:id="@+id/flashcard_listen"/>
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_alignParentRight="true"
+                android:backgroundTint="@color/white"
+                android:tint="@color/black"
+                android:id="@+id/flashcard_menu"
+                android:src="@drawable/ic_baseline_more_vert_24"/>
+
+            <TextView
+                android:id="@+id/flashcard_listitem_definition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp"
+                android:paddingLeft="16dp"
+                android:layout_below="@id/flashcard_listitem_term"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/roboto_light"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#212121"
+                android:text="apple"/>
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView >
+
+</LinearLayout>

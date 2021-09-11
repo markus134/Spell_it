@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="15dp"
+        android:textSize="15sp"
+        android:text="Kas te tahaksite jätkata või alustada algusest?"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:baselineAligned="false"
+        android:gravity="center_horizontal">
+        <Button
+            android:layout_width="123dp"
+            android:layout_height="55dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/blue"
+            android:text="JÄTKA"
+            android:textSize="13sp"
+            android:id="@+id/flashcard_continue_practice_dialog"
+            android:layout_marginRight="10dp"/>
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="55dp"
+            android:textSize="13sp"
+            android:text="ALUSTA ALGUSEST"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/blue"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/flashcard_start_beginning_dialog"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"/>
+
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

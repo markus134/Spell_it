@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#E8E8E8">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/flashcard_study_term"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="19sp"
+        android:text="apple"
+        android:textColor="@color/black"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="11dp"
+        android:layout_below="@id/flashcard_study_term"
+        android:id="@+id/flashcard_study_definition"
+        android:hint="Definitsioon"
+        android:backgroundTint="@color/blue"
+        android:inputType="text"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFF6147"
+        android:layout_below="@id/flashcard_study_definition"
+        android:id="@+id/flashcard_study_your_upper_answer"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="11dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#262626"
+        android:layout_below="@id/flashcard_study_your_upper_answer"
+        android:id="@+id/flashcard_study_your_lower_answer"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="16dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/flashcard_study_upper_correct_answer"
+        android:layout_below="@id/flashcard_study_your_lower_answer"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="11dp"
+        android:textColor="#FF74CEA2"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/flashcard_study_upper_correct_answer"
+
+        android:id="@+id/flashcard_study_lower_correct_answer"
+        android:textColor="#262626"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"/>
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/flashcard_study_submit"
+        android:text="Esita"
+        android:layout_alignParentBottom="true"/>
+
+
+</RelativeLayout>
