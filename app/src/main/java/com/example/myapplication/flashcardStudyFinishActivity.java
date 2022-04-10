@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.data.flashcardData.flashcardContract;
 import com.example.myapplication.data.flashcardData.flashcardContract.flashcardEntry;
 import com.example.myapplication.data.flashcardSetData.flashcardSetContract;
 import com.example.myapplication.data.flashcardData.flashcardDbHelper;
@@ -36,6 +38,9 @@ public class flashcardStudyFinishActivity extends AppCompatActivity {
     static String flashcard_set_id;
     static String CorrectAnswerCount;
     static String IncorrectAnswerCount;
+    static public int flashcardCount;
+    static int groupNumber;
+    boolean isThisTheFinalRound;
     TextToSpeech tts;
     int finalRoundFlashcardAmount;
     @Override
@@ -49,6 +54,7 @@ public class flashcardStudyFinishActivity extends AppCompatActivity {
 
         displayFlashcardCorrectAnswerDatabaseInfo();
         displayFlashCardIncorrectAnswerDatabaseInfo();
+        IsThisTheFinalRound();
         displayDatabaseScoreInfo();
 
         ListView mCorrectAnswerListview = findViewById(R.id.flashcard_study_finish_correct_listview);
@@ -93,6 +99,19 @@ public class flashcardStudyFinishActivity extends AppCompatActivity {
         flashcardCursorAdapter flashcardCursorAdapter = new flashcardCursorAdapter(this, cursorCorrectAnswer);
 
         CorrectAnswerCount = String.valueOf(cursorCorrectAnswer.getCount());
+        if (Integer.parseInt(CorrectAnswerCount) == 1){
+            cursorCorrectAnswer.moveToFirst();
+            String flashcard_id = cursorCorrectAnswer.getString(cursorCorrectAnswer.getColumnIndex(flashcardEntry._ID));
+
+            String[] projection2 = {flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER};
+            String selection2 = flashcardEntry._ID + "=?";
+            String[] selectionArgs2 = {flashcard_id};
+            Cursor cursor2 = getContentResolver().query(flashcardEntry.CONTENT_URI, projection2, selection2, selectionArgs2, null);
+            cursor2.moveToFirst();
+
+            groupNumber = cursor2.getInt(cursor2.getColumnIndex(flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER));
+            cursor2.close();
+        }
 
         if (Integer.parseInt(CorrectAnswerCount) != 0){
             TextView mCorrectAnswerCountTextView = findViewById(R.id.flashcard_study_finish_correct_answer_count);
@@ -104,7 +123,7 @@ public class flashcardStudyFinishActivity extends AppCompatActivity {
             }
 
 
-            ListView flashcardsListView = (ListView) findViewById(R.id.flashcard_study_finish_correct_listview);
+            ListView flashcardsListView = findViewById(R.id.flashcard_study_finish_correct_listview);
             flashcardsListView.setBackgroundColor(Color.WHITE);
 
 
@@ -159,21 +178,37 @@ public class flashcardStudyFinishActivity extends AppCompatActivity {
 
         TextView mScoreTextView = findViewById(R.id.flashcard_study_finish_score);
         mScoreTextView.setText(scoreText);
+        if (isThisTheFinalRound){
+            TextView mRoundTextView = findViewById(R.id.flashcard_study_finish_round);
+            mRoundTextView.setText("Palju õnne! Te olete õppinud kõik sõnad ära.");
+            mRoundTextView.setGravity(Gravity.CENTER);
+            mRoundTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 
-        Uri uri = getIntent().getData();
-        String flashcard_set_id = String.valueOf(ContentUris.parseId(uri));
+            TextView mResultText = findViewById(R.id.flashcard_study_finish_result_text);
+            mResultText.setText("Teie viimase vooru tulemus oli:");
 
-        String[] projection = {flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND};
-        String selection = flashcardSetContract.flashcardSetEntry.flashcardSetId + "=?";
-        String[] selectionArgs = {flashcard_set_id};
-        Cursor cursor1 = getContentResolver().query(flashcardSetContract.flashcardSetEntry.CONTENT_URI, projection, selection, selectionArgs, null);
-        cursor1.moveToFirst();
+            Button mButtonContinue = findViewById(R.id.flashcard_study_finish_continue);
+            mButtonContinue.setVisibility(View.GONE);
 
-        int currentRound = cursor1.getInt(cursor1.getColumnIndex(flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND));
-        cursor1.close();
+        }
+        else
+        {
+            Uri uri = getIntent().getData();
+            String flashcard_set_id = String.valueOf(ContentUris.parseId(uri));
 
-        TextView mRoundTextView = findViewById(R.id.flashcard_study_finish_round);
-        mRoundTextView.setText(currentRound + ". vooru lõpp");
+            String[] projection = {flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND};
+            String selection = flashcardSetContract.flashcardSetEntry.flashcardSetId + "=?";
+            String[] selectionArgs = {flashcard_set_id};
+            Cursor cursor1 = getContentResolver().query(flashcardSetContract.flashcardSetEntry.CONTENT_URI, projection, selection, selectionArgs, null);
+            cursor1.moveToFirst();
+
+            int currentRound = cursor1.getInt(cursor1.getColumnIndex(flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND));
+            cursor1.close();
+
+            TextView mRoundTextView = findViewById(R.id.flashcard_study_finish_round);
+            mRoundTextView.setText(currentRound + ". vooru lõpp");
+        }
+
     }
     //Set listview heights based on their children
     public static void setListViewHeightBasedOnChildren(ListView listView) {
@@ -200,23 +235,20 @@ public class flashcardStudyFinishActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                int finalRoundFlashcardAmount;
-                SQLiteDatabase db = mDbHelper.getReadableDatabase();
-                Cursor cursorFinalRound = db.rawQuery("SELECT " + flashcardEntry._ID + ", " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + " FROM " + flashcardEntry.TABLE_NAME + " WHERE " + flashcardEntry.FLASHCARD_SET_ID + " = ?" + " AND " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + " = ?", new  String[] {flashcard_set_id, "3"});
-                if (cursorFinalRound == null){
-                    finalRoundFlashcardAmount = -1;
-                }
-                else{
-                    finalRoundFlashcardAmount = cursorFinalRound.getCount();
-                }
-
                 //If this is the final round
-                if (Integer.parseInt(CorrectAnswerCount) == finalRoundFlashcardAmount && Integer.parseInt(IncorrectAnswerCount) == 0){
+                if (isThisTheFinalRound){
                     String selection = flashcardSetContract.flashcardSetEntry.flashcardSetId + "=?";
                     String[] selectionArgs = {flashcard_set_id};
                     ContentValues values = new ContentValues();
-                    values.put(flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND, 0);
+                    values.put(flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND, 0); // Reset group number to 0 after the final round is completed
                     getContentResolver().update(flashcardSetContract.flashcardSetEntry.CONTENT_URI, values, selection, selectionArgs);
+
+                    String selection1 = flashcardEntry.FLASHCARD_SET_ID + "=?";
+                    String[] selectionArgs1 = {flashcard_set_id};
+                    ContentValues values1 = new ContentValues();
+                    values1.put(flashcardEntry.COLUMN_FLASHCARD_FIRST_TRY_RESULT, 0); //Reset first try result to 0 after the final round is completed
+                    getContentResolver().update(flashcardEntry.CONTENT_URI, values1, selection1, selectionArgs1);
+
                     Intent intent = new Intent(flashcardStudyFinishActivity.this, MainActivity.class);
                     startActivity(intent);
                 }
@@ -232,6 +264,12 @@ public class flashcardStudyFinishActivity extends AppCompatActivity {
                     ContentValues values1 = new ContentValues();
                     values1.put(flashcardEntry.COLUMN_FLASHCARD_RESULT, 2);
                     getContentResolver().update(flashcardEntry.CONTENT_URI, values1, selection1, selectionArgs1);
+
+                    String selection2 = flashcardEntry.FLASHCARD_SET_ID + "=?" + " AND " +flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER +"=?";
+                    String[] selectionArgs2 = {flashcard_set_id, "3"};
+                    ContentValues values2 = new ContentValues();
+                    values2.put(flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER, 4);
+                    getContentResolver().update(flashcardEntry.CONTENT_URI, values2, selection2, selectionArgs2);
 
                 }
             }
@@ -261,14 +299,6 @@ public class flashcardStudyFinishActivity extends AppCompatActivity {
         contentValues2.put(flashcardEntry.COLUMN_FLASHCARD_RESULT, "2");
         getContentResolver().update(flashcardEntry.CONTENT_URI, contentValues2, selection2, selectionArgs2);
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursorFinalRound = db.rawQuery("SELECT " + flashcardEntry._ID + ", " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + " FROM " + flashcardEntry.TABLE_NAME + " WHERE " + flashcardEntry.FLASHCARD_SET_ID + " = ?" + " AND " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + " = ?", new  String[] {flashcard_set_id, "3"});
-        if (cursorFinalRound == null){
-            finalRoundFlashcardAmount = -1;
-        }
-        else{
-            finalRoundFlashcardAmount = cursorFinalRound.getCount();
-        }
 
         if (Integer.parseInt(CorrectAnswerCount) == finalRoundFlashcardAmount && Integer.parseInt(IncorrectAnswerCount) == 0) {
             String selection = flashcardSetContract.flashcardSetEntry.flashcardSetId + "=?";
@@ -293,6 +323,36 @@ public class flashcardStudyFinishActivity extends AppCompatActivity {
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
             }
         });
+
+    }
+    public void IsThisTheFinalRound(){
+        boolean LastCardCorrect;
+        int CorrectAnswerCount = cursorCorrectAnswer.getCount();
+        int IncorrectAnswerCount = cursorIncorrectAnswer.getCount();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursorFinalRound = db.rawQuery("SELECT " + flashcardEntry._ID + ", " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + " FROM " + flashcardEntry.TABLE_NAME + " WHERE " + flashcardEntry.FLASHCARD_SET_ID + " = ?" + " AND " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + " = ?", new  String[] {flashcard_set_id, "3"});
+        if (cursorFinalRound == null){
+            finalRoundFlashcardAmount = -1;
+        }
+        else{
+            finalRoundFlashcardAmount = cursorFinalRound.getCount();
+        }
+
+        if (finalRoundFlashcardAmount == 1 && groupNumber == 3){
+            LastCardCorrect = true;
+        }
+        else if (finalRoundFlashcardAmount != 1){
+            LastCardCorrect = true;
+        }
+        else{
+            LastCardCorrect = false;
+        }
+        if (CorrectAnswerCount == finalRoundFlashcardAmount && IncorrectAnswerCount == 0 && LastCardCorrect){
+            isThisTheFinalRound = true;
+        }
+        else {
+            isThisTheFinalRound = false;
+        }
 
     }
 

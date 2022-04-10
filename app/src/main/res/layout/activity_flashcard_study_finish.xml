@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:text="Teie tulemus oli:"
             android:textSize="17sp"
+            android:id="@+id/flashcard_study_finish_result_text"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"/>
         <TextView

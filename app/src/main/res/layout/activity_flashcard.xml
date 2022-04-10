@@ -11,6 +11,22 @@
         android:id="@+id/flashcard_listview"
         android:divider="#E8E8E8"
         android:dividerHeight="15.0sp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/flashcard_empty_view"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:paddingLeft="25dp"
+            android:text="Teil ei ole praegu ühtegi sõnakaarti. Alustage nende loomist vajutades + peale."
+            android:textColor="#626262"
+            android:textSize="19sp" />
+    </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_flashcard_set_activity"
         android:layout_width="wrap_content"

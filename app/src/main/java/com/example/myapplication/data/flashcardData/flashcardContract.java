@@ -20,6 +20,7 @@ public final class flashcardContract {
         public static final String COLUMN_FLASHCARD_DEFINITION = "definition";
         public static final String COLUMN_FLASHCARD_GROUP_NUMBER = "groupNumber";
         public static final String COLUMN_FLASHCARD_RESULT = "result";
+        public static final String COLUMN_FLASHCARD_FIRST_TRY_RESULT = "firstTryResult";
 
         //Mime type for list of flashcards
         public static final String CONTENT_LIST_TYPE =

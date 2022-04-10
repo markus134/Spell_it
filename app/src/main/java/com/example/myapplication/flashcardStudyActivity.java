@@ -21,7 +21,7 @@ import androidx.core.view.ViewCompat;
 
 import com.example.myapplication.data.flashcardData.flashcardContract.flashcardEntry;
 import com.example.myapplication.data.flashcardData.flashcardDbHelper;
-import com.example.myapplication.data.flashcardSetData.flashcardSetContract;
+import com.example.myapplication.data.flashcardSetData.flashcardSetContract.flashcardSetEntry;
 
 public class flashcardStudyActivity extends AppCompatActivity {
     flashcardDbHelper mDbHelper;
@@ -40,6 +40,7 @@ public class flashcardStudyActivity extends AppCompatActivity {
     static int groupNumber;
     static int _id;
     static int position = 0;
+    static int first_try_result;
     static Cursor cursor;
     String flashcard_set_id;
 
@@ -56,16 +57,17 @@ public class flashcardStudyActivity extends AppCompatActivity {
 
 
                 if (change.equals("beginning")){
-                    String newSelection = flashcardSetContract.flashcardSetEntry.flashcardSetId + "=?";
+                    String newSelection = flashcardSetEntry.flashcardSetId + "=?";
                     String[] newSelectionArgs = {flashcard_set_id};
                     ContentValues newValues = new ContentValues();
-                    newValues.put(flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND, "0");
-                    getContentResolver().update(flashcardSetContract.flashcardSetEntry.CONTENT_URI, newValues, newSelection, newSelectionArgs);
+                    newValues.put(flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND, "0");
+                    getContentResolver().update(flashcardSetEntry.CONTENT_URI, newValues, newSelection, newSelectionArgs);
 
                     String selection = flashcardEntry.FLASHCARD_SET_ID + "=?";
                     String[] selectionArgs = {flashcard_set_id};
                     ContentValues values = new ContentValues();
                     values.put(flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER, "0");
+                    values.put(flashcardEntry.COLUMN_FLASHCARD_FIRST_TRY_RESULT, "0");
                     getContentResolver().update(flashcardEntry.CONTENT_URI, values, selection, selectionArgs);
                 }
 
@@ -78,12 +80,13 @@ public class flashcardStudyActivity extends AppCompatActivity {
 
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        cursor = db.rawQuery("SELECT " + flashcardEntry._ID + ", " + flashcardEntry.COLUMN_FLASHCARD_TERM + ", " + flashcardEntry.COLUMN_FLASHCARD_DEFINITION + ", " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + ", " + flashcardEntry.FLASHCARD_SET_ID
+        cursor = db.rawQuery("SELECT " + flashcardEntry._ID + ", " + flashcardEntry.COLUMN_FLASHCARD_TERM + ", " + flashcardEntry.COLUMN_FLASHCARD_DEFINITION + ", " + flashcardEntry.COLUMN_FLASHCARD_FIRST_TRY_RESULT +", " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + ", " + flashcardEntry.FLASHCARD_SET_ID
                 + " FROM " + flashcardEntry.TABLE_NAME
                 + " WHERE " + flashcardEntry.FLASHCARD_SET_ID + " = ?"
                 + " AND " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + " < 3" + " ORDER BY RANDOM()",
                 new  String[] {flashcard_set_id});
         position = 0;
+
         updateInfo();
         }
     private void updateInfo() {
@@ -91,24 +94,24 @@ public class flashcardStudyActivity extends AppCompatActivity {
         if (cursorCount == position){
             cursor.close();
 
-            String[] projection = {flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND};
-            String selection = flashcardSetContract.flashcardSetEntry.flashcardSetId + "=?";
+            String[] projection = {flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND};
+            String selection = flashcardSetEntry.flashcardSetId + "=?";
             String[] selectionArgs = {flashcard_set_id};
-            Cursor cursor1 = getContentResolver().query(flashcardSetContract.flashcardSetEntry.CONTENT_URI, projection, selection, selectionArgs, null);
+            Cursor cursor1 = getContentResolver().query(flashcardSetEntry.CONTENT_URI, projection, selection, selectionArgs, null);
             cursor1.moveToFirst();
 
-            int currentRound = cursor1.getInt(cursor1.getColumnIndex(flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND));
+            int currentRound = cursor1.getInt(cursor1.getColumnIndex(flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND));
 
-            String newSelection = flashcardSetContract.flashcardSetEntry.flashcardSetId + "=?";
+            String newSelection = flashcardSetEntry.flashcardSetId + "=?";
             String[] newSelectionArgs = {flashcard_set_id};
             ContentValues contentValues = new ContentValues();
-            contentValues.put(flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND, currentRound + 1);
+            contentValues.put(flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND, currentRound + 1);
             cursor1.close();
 
-            getContentResolver().update(flashcardSetContract.flashcardSetEntry.CONTENT_URI, contentValues, newSelection, newSelectionArgs);
+            getContentResolver().update(flashcardSetEntry.CONTENT_URI, contentValues, newSelection, newSelectionArgs);
 
             Intent intent = new Intent(flashcardStudyActivity.this, flashcardStudyFinishActivity.class);
-            Uri currentFlashcardSetUri = ContentUris.withAppendedId(flashcardSetContract.flashcardSetEntry.CONTENT_URI, Long.parseLong(flashcard_set_id));
+            Uri currentFlashcardSetUri = ContentUris.withAppendedId(flashcardSetEntry.CONTENT_URI, Long.parseLong(flashcard_set_id));
             intent.setData(currentFlashcardSetUri);
             startActivity(intent);
         }
@@ -119,6 +122,7 @@ public class flashcardStudyActivity extends AppCompatActivity {
             groupNumber = cursor.getInt(cursor.getColumnIndex(flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER));
             _id = cursor.getInt(cursor.getColumnIndex(flashcardEntry._ID));
             position++;
+            first_try_result = cursor.getInt(cursor.getColumnIndex(flashcardEntry.COLUMN_FLASHCARD_FIRST_TRY_RESULT));
             updateUi();
         }
     }
@@ -147,6 +151,15 @@ public class flashcardStudyActivity extends AppCompatActivity {
                     values.put(flashcardEntry.COLUMN_FLASHCARD_RESULT, "0"); // 0 result means correct answer
                     String newSelection = flashcardEntry._ID + "=?";
                     String[] newSelectionArgs = {String.valueOf(_id)};
+                    //Check if the answer was correct the first time. 0 means first try
+                    if (first_try_result == 0){
+                        values.put(flashcardEntry.COLUMN_FLASHCARD_FIRST_TRY_RESULT, "1"); //1 means that this is not the first time this flashcard has been answered
+                        //Put the flashcard into the finished cards group
+                        values.put(flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER, "3");
+                    }
+                    else {
+                        values.put(flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER, String.valueOf(groupNumber + 1));
+                    }
 
                     getContentResolver().update(flashcardEntry.CONTENT_URI, values, newSelection, newSelectionArgs);
                     updateInfo();
@@ -157,6 +170,7 @@ public class flashcardStudyActivity extends AppCompatActivity {
                         values.put(flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER, String.valueOf(groupNumber - 1));
                     }
                     values.put(flashcardEntry.COLUMN_FLASHCARD_RESULT, "1"); //1 result means incorrect answer
+                    values.put(flashcardEntry.COLUMN_FLASHCARD_FIRST_TRY_RESULT, "1"); //1 means that this is not the first time this flashcard has been answered
                     String newSelection = flashcardEntry._ID + "=?";
                     String[] newSelectionArgs = {String.valueOf(_id)};
 
@@ -212,12 +226,12 @@ public class flashcardStudyActivity extends AppCompatActivity {
         Uri uri = getIntent().getData();
         String flashcard_set_id = String.valueOf(ContentUris.parseId(uri));
 
-        String[] projection = {flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_NAME};
-        String selection = flashcardSetContract.flashcardSetEntry.flashcardSetId + "=?";
+        String[] projection = {flashcardSetEntry.COLUMN_FLASHCARD_SET_NAME};
+        String selection = flashcardSetEntry.flashcardSetId + "=?";
         String[] selectionArgs = {flashcard_set_id};
-        Cursor cursor = getContentResolver().query(flashcardSetContract.flashcardSetEntry.CONTENT_URI, projection, selection, selectionArgs, null);
+        Cursor cursor = getContentResolver().query(flashcardSetEntry.CONTENT_URI, projection, selection, selectionArgs, null);
         if (cursor.moveToFirst()){
-            String flashcard_set_name = cursor.getString(cursor.getColumnIndex(flashcardSetContract.flashcardSetEntry.COLUMN_FLASHCARD_SET_NAME));
+            String flashcard_set_name = cursor.getString(cursor.getColumnIndex(flashcardSetEntry.COLUMN_FLASHCARD_SET_NAME));
             getSupportActionBar().setTitle(flashcard_set_name);
         }
     }

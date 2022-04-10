@@ -15,7 +15,7 @@ public class flashcardDbHelper extends SQLiteOpenHelper {
     }
     @Override
     public void onCreate(SQLiteDatabase db){
-        String SQL_CREATE_ENTRIES = "CREATE TABLE " + flashcardEntry.TABLE_NAME + " (" + flashcardEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " + flashcardEntry.FLASHCARD_SET_ID + " INTEGER" + ", " + flashcardEntry.COLUMN_FLASHCARD_TERM + " TEXT NOT NULL" + ", " + flashcardEntry.COLUMN_FLASHCARD_RESULT + " INTEGER NOT NULL" + ", " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + " INTEGER DEFAULT 0" + ", " + flashcardEntry.COLUMN_FLASHCARD_DEFINITION + " TEXT NOT NULL )";
+        String SQL_CREATE_ENTRIES = "CREATE TABLE " + flashcardEntry.TABLE_NAME + " (" + flashcardEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " + flashcardEntry.FLASHCARD_SET_ID + " INTEGER" + ", " + flashcardEntry.COLUMN_FLASHCARD_TERM + " TEXT NOT NULL" + ", " + flashcardEntry.COLUMN_FLASHCARD_FIRST_TRY_RESULT + " INTEGER NOT NULL" + ", " + flashcardEntry.COLUMN_FLASHCARD_RESULT + " INTEGER NOT NULL" + ", " + flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER + " INTEGER DEFAULT 0" + ", " + flashcardEntry.COLUMN_FLASHCARD_DEFINITION + " TEXT NOT NULL )";
         db.execSQL(SQL_CREATE_ENTRIES);
     }
     @Override

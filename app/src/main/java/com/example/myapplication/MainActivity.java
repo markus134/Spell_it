@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.myapplication.data.flashcardData.flashcardContract.flashcardEntry;
 import com.example.myapplication.data.flashcardSetData.flashcardSetContract.flashcardSetEntry;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Spell it!");
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         FloatingActionButton fab = findViewById(R.id.fab_flashcard_set_activity);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,8 +94,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
 
         String[] projection = {flashcardSetEntry._ID, flashcardSetEntry.COLUMN_FLASHCARD_SET_NAME, flashcardSetEntry.COLUMN_FLASHCARD_SET_ROUND};
         Cursor cursor = getContentResolver().query(flashcardSetEntry.CONTENT_URI, projection, null, null, null);
@@ -101,6 +101,10 @@ public class MainActivity extends AppCompatActivity {
         flashcardSetCursorAdapter flashcardSetCursorAdapter = new flashcardSetCursorAdapter(this, cursor);
 
         ListView flashcardSetsListView = (ListView) findViewById(R.id.flashCardSets_listview);
+
+        View emptyView = findViewById(R.id.flashcard_set_empty_view);
+        flashcardSetsListView.setEmptyView(emptyView);
+        
         flashcardSetsListView.setAdapter(flashcardSetCursorAdapter);
         flashcardSetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

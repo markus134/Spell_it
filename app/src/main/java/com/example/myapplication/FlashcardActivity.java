@@ -75,11 +75,12 @@ public class FlashcardActivity extends AppCompatActivity {
                     }
 
                     ContentValues values = new ContentValues();
-                    values.put(flashcardContract.flashcardEntry.FLASHCARD_SET_ID, flashcard_set_id);
-                    values.put(flashcardContract.flashcardEntry.COLUMN_FLASHCARD_TERM, term);
-                    values.put(flashcardContract.flashcardEntry.COLUMN_FLASHCARD_DEFINITION, definition);
-                    values.put(flashcardContract.flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER, "0");
-                    values.put(flashcardContract.flashcardEntry.COLUMN_FLASHCARD_RESULT, "2");
+                    values.put(flashcardEntry.FLASHCARD_SET_ID, flashcard_set_id);
+                    values.put(flashcardEntry.COLUMN_FLASHCARD_TERM, term);
+                    values.put(flashcardEntry.COLUMN_FLASHCARD_DEFINITION, definition);
+                    values.put(flashcardEntry.COLUMN_FLASHCARD_GROUP_NUMBER, "0");
+                    values.put(flashcardEntry.COLUMN_FLASHCARD_RESULT, "2");
+                    values.put(flashcardEntry.COLUMN_FLASHCARD_FIRST_TRY_RESULT, "0");
 
                     getContentResolver().insert(flashcardContract.flashcardEntry.CONTENT_URI, values);
 
@@ -107,16 +108,18 @@ public class FlashcardActivity extends AppCompatActivity {
 
 
 
-        String[] projection = {flashcardContract.flashcardEntry._ID, flashcardContract.flashcardEntry.COLUMN_FLASHCARD_TERM, flashcardContract.flashcardEntry.COLUMN_FLASHCARD_DEFINITION};
-        String selection = flashcardContract.flashcardEntry.FLASHCARD_SET_ID + "=?";
+        String[] projection = {flashcardEntry._ID, flashcardEntry.COLUMN_FLASHCARD_TERM, flashcardEntry.COLUMN_FLASHCARD_DEFINITION, flashcardEntry.COLUMN_FLASHCARD_FIRST_TRY_RESULT};
+        String selection = flashcardEntry.FLASHCARD_SET_ID + "=?";
         String[] selectionArgs = {flashcard_set_id};
-        Cursor cursor = getContentResolver().query(flashcardContract.flashcardEntry.CONTENT_URI, projection, selection, selectionArgs, null);
+        Cursor cursor = getContentResolver().query(flashcardEntry.CONTENT_URI, projection, selection, selectionArgs, null);
 
         flashcardCursorAdapter flashcardCursorAdapter = new flashcardCursorAdapter(this, cursor);
 
         ListView flashcardsListView = findViewById(R.id.flashcard_listview);
         flashcardsListView.setBackgroundColor(Color.WHITE);
 
+        View emptyView = findViewById(R.id.flashcard_empty_view);
+        flashcardsListView.setEmptyView(emptyView);
 
         flashcardsListView.setAdapter(flashcardCursorAdapter);
     }
